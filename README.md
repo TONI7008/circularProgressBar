@@ -1,6 +1,6 @@
 # Circular Progress Bar
 
-A modern and customizable circular progress bar implemented in C++.
+A modern and customizable circular progress bar implemented in C++ with Qt framework.
 
 ## Features
 - Customizable size and appearance
