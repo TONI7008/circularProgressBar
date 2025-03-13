@@ -20,14 +20,31 @@ A modern and customizable circular progress bar implemented in C++.
 Include the header file and use the progress bar in your C++ application:
 
 ```cpp
+#include <QCoreApplication>
+#include <QApplication>
 #include "circularprogressbar.h"
 
-int main() {
-    CircularProgressBar progressBar(100); // Initialize with max value of 100
-    progressBar.setValue(50); // Set progress to 50%
-    progressBar.render(); // Render the progress bar
-    return 0;
+int main(int argc, char *argv[]) {
+    QApplication app(argc, argv);
+
+    CircularProgressBar *bar=new CircularProgressBar(nullptr);
+
+    //uncoment to see it moving
+    //bar->setInfiniteLoop(true);
+    bar->setProgressAlignment(Qt::AlignCenter);
+    bar->setRange(0,1000);
+    bar->setEnableText(true);
+    bar->setBgColor(Qt::lightGray);
+    bar->setChunkColor(QColor(255,255,197));
+    bar->setValue(718);
+    bar->show();
+
+    short d=app.exec();
+
+    delete bar;
+    return d;
 }
+
 ```
 
 ## Contributing
