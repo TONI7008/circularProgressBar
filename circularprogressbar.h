@@ -5,74 +5,82 @@
 #include <QPropertyAnimation>
 #include <QPainter>
 #include <QPushButton>
-#include <QThread>
 #include <QEasingCurve>
-#include <QResizeEvent>
 #include <QGraphicsDropShadowEffect>
 #include <QTimer>
 
 class CircularProgressBar : public QProgressBar {
     Q_OBJECT
     Q_PROPERTY(int startAngle READ angle WRITE setAngle NOTIFY startAngleChanged)
+    Q_PROPERTY(float animationProgress READ animationProgress WRITE setAnimationProgress NOTIFY animationProgressChanged)
     Q_PROPERTY(double chunkLength READ chunkLength WRITE setChunkLength NOTIFY chunkLengthChanged)
 
 public:
-    CircularProgressBar(QWidget *parent = nullptr);
+    explicit CircularProgressBar(QWidget *parent = nullptr);
     ~CircularProgressBar();
 
     // Setters
-    void setCircularDegree(const int &value = 270);
-    void setSquare(const bool &enable = false);
-    void setGradient(const bool &enable = false);
+    void setCircularDegree(int value = 270);
+    void setValue(int value = 0);
+    void setSquare(bool enable = false);
+    void setGradient(bool enable = false);
     void setGradientValues(const QMap<qreal, QColor> &map);
-    void setMargin(const int &x = 0, const int &y = 0);
-    void setTextAlignment(const Qt::Alignment &alignment = Qt::AlignCenter);
-    void setProgressAlignment(const Qt::Alignment &alignment = Qt::AlignCenter);
-    void setShadow(const bool &enable = true);
-    void setWidth(const int &width = 200);
-    void setHeight(const int &height = 200);
-    void setProgressWidth(const int &width = 10);
-    void setProgressRoundedCap(const bool &enable = true);
-    void setEnableBg(const bool &enable = true);
+    void setMargin(int x = 0, int y = 0);
+    void setTextAlignment(Qt::Alignment alignment = Qt::AlignCenter);
+    void setProgressAlignment(Qt::Alignment alignment = Qt::AlignCenter);
+    void setShadow(bool enable = true);
+    void setWidth(int width = 200);
+    void setHeight(int height = 200);
+    void setProgressWidth(int width = 10);
+    void setProgressRoundedCap(bool enable = true);
+    void setEnableBg(bool enable = true);
     void setBgColor(const QColor &color = QColor(68, 71, 90));
     void setChunkColor(const QColor &color = QColor(73, 139, 209));
-    void setEnableText(const bool &enable = true);
+    void setEnableText(bool enable = true);
+    void setMaxValue(int value = 100);
+    void setMinValue(int value = 0);
     void setSuffix(const QString &suffix = "%");
     void setInfiniteLoop(bool loop);
     void setTextColor(const QColor &color = QColor(73, 139, 209));
-    void setEasingcurve(QEasingCurve::Type);
+    void setRange(int minValue, int maxValue);
+    void setEasingCurve(QEasingCurve::Type curve);
     void setChunkLength(double length);
     void setDuration(short duration);
+    void setAnimationProgress(float progress);
+    void setAnimationThreshold(float threshold);
 
     // Getters
-    double chunkLength() { return m_chunkLength; }
-    int getCircularDegree() const { return this->circularDegree; }
-    int getMarginX() const { return this->marginX; }
-    int getMarginY() const { return this->marginY; }
-    int getWidth() const { return this->width; }
-    bool getSquared() const { return this->square; }
-    bool getGradient() const { return this->gradient; }
-    QMap<qreal, QColor> getGradientValues() const { return this->gradient_colors; }
-    int getHeight() const { return this->height; }
-    int getProgressWidth() const { return this->progress_width; }
-    Qt::Alignment getTextAlignment() const { return this->textAlignment; }
-    Qt::Alignment getProgressAlignment() const { return this->progressAlignment; }
-    bool getShadow() const { return this->shadow; }
-    bool getProgressRoundedCap() const { return this->progress_rounded_cap; }
-    bool getEnableBg() const { return this->enable_bg; }
-    QColor getBgColor() const { return this->bg_color; }
-    QColor chunkColor() const { return this->chunk_color; }
-    bool getEnableText() const { return this->enable_text; }
-    QString getSuffix() const { return this->suffix; }
-    QColor getTextColor() const { return this->text_color; }
+    double chunkLength() const { return m_chunkLength; }
+    int getCircularDegree() const { return circularDegree; }
+    int getMarginX() const { return marginX; }
+    int getMarginY() const { return marginY; }
+    int getWidth() const { return width; }
+    bool isSquared() const { return square; }
+    bool hasGradient() const { return gradient; }
+    QMap<qreal, QColor> getGradientValues() const { return gradient_colors; }
+    int getHeight() const { return height; }
+    int getProgressWidth() const { return progress_width; }
+    Qt::Alignment getTextAlignment() const { return textAlignment; }
+    Qt::Alignment getProgressAlignment() const { return progressAlignment; }
+    bool hasShadow() const { return shadow; }
+    bool hasRoundedCap() const { return progress_rounded_cap; }
+    bool isBackgroundEnabled() const { return enable_bg; }
+    QColor getBgColor() const { return bg_color; }
+    QColor getChunkColor() const { return chunk_color; }
+    bool isTextEnabled() const { return enable_text; }
+    QString getSuffix() const { return suffix; }
+    QColor getTextColor() const { return text_color; }
+    float animationProgress() const { return m_animationProgress; }
+    float animationThreshold() const { return m_threshold; }
+    bool isInfiniteLoop() const { return infiniteloop; }
     void stop();
-    bool isStop() const;
-    QPushButton* button() const;
-
-    void updateChunkPosition();
+    bool isStopped() const { return m_stop; }
 
 signals:
+    void modeChanged(bool isInfinite);
+    void animationProgressChanged(float progress);
     void SI_circularDegreeChanged(int value);
+    void SI_valueChanged(int value);
     void SI_shadowChanged(bool enable);
     void SI_squareChanged(bool enable);
     void SI_marginChanged(int x, int y);
@@ -90,57 +98,60 @@ signals:
     void SI_textEnableChanged(bool enable);
     void SI_suffixChanged(QString suffix);
     void SI_textColorChanged(QColor color);
-
-    void chunkLengthChanged(double);
-    void startAngleChanged(int);
-    void stopEmitted(bool);
+    void chunkLengthChanged(double length);
+    void startAngleChanged(int angle);
+    void stopEmitted(bool stopped);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
 private:
+    void updateChunkPosition();
+    void updateProgressAnimation();
+    void setupAnimations();
+    int angle() const { return startAngle; }
+    void setAngle(int angle);
+
     QPainter *paint = nullptr;
     QPropertyAnimation *animation = nullptr;
-    QTimer* m_timer = nullptr;
+    QTimer *m_timer = nullptr;
+    QPushButton *stopButton = nullptr;
 
+    // Visual properties
     bool square = true;
     int circularDegree = 360;
     int width = 100;
+    int height = 100;
     int marginX = 0;
     int marginY = 0;
-    int height = 100;
     int progress_width = 10;
     bool shadow = false;
     bool progress_rounded_cap = true;
     bool enable_bg = true;
     bool gradient = false;
-    Qt::Alignment textAlignment = Qt::AlignCenter;
-    Qt::Alignment progressAlignment = Qt::AlignCenter;
+    bool enable_text = true;
+    bool infiniteloop = false;
+    bool m_stop = false;
+
+    // Animation properties
+    float m_animationProgress = 0.0f;
+    float m_threshold = 0.02f;
+    int startAngle = 0;
+    short m_duration = 18;
+    double m_chunkLength = 135;
+    QEasingCurve::Type m_curve = QEasingCurve::OutQuart;
+
+    // Color properties
     QColor bg_color = QColor(20, 20, 20, 255);
     QColor chunk_color = QColor(73, 139, 209);
-    bool enable_text = true;
-
-    bool infiniteloop = false;
-    int startAngle = 0;
-    short m_duration;
-
-    QString suffix = "%";
     QColor text_color = QColor(73, 139, 209);
     QMap<qreal, QColor> gradient_colors;
 
-    double m_chunkLength = 180;
-    QEasingCurve::Type m_curve = QEasingCurve::OutQuart;
-    QPushButton *stopButton = nullptr;
-    bool wasIncreasing = false;
-
-private slots:
-    int angle() { return startAngle; }
-    void setAngle(int angle) {
-        startAngle = angle;
-        repaint();
-    }
-    void start();
+    // Text properties
+    QString suffix = "%";
+    Qt::Alignment textAlignment = Qt::AlignCenter;
+    Qt::Alignment progressAlignment = Qt::AlignCenter;
 };
 
 #endif // CIRCULARPROGRESSBAR_H
