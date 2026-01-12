@@ -10,8 +10,8 @@ A modern and customizable circular progress bar implemented in C++ with Qt frame
 ## Installation
 1. Clone this repository:
    ```sh
-   git clone git@github.com:TONI7008/circularProgressBar.git
-   cd circular-progress-bar
+   git clone https://github.com/TONI7008/circularProgressBar.git
+   cd circularProgressBar
    ```
 2. Include `circularprogressbar.h` and `circularprogressbar.cpp` in your project.
 
@@ -46,6 +46,9 @@ int main(int argc, char *argv[]) {
 }
 
 ```
+## Images
+
+| ![MainWindow](https://github.com/TONI7008/circularProgressBar/blob/main/Images/preview.png)  |
 
 ## Contributing
 Contributions are welcome! Please follow these steps:
